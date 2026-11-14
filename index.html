@@ -1,511 +1,428 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planejamento Sub-20 (5km) & Musculação</title>
+    <title>App Treino: Sub-20 & Hipertrofia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #1e3a8a;
-            --primary-dark: #0f172a;
-            --accent: #2563eb;
-            --bg-light: #f1f5f9;
-            --text-main: #334155;
-            --border-color: #cbd5e1;
+        body { font-family: 'Inter', sans-serif; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-main);
-            margin: 0;
-            padding: 15px;
+        /* Toast animation */
+        #toast {
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease-in-out;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .container {
-            max-width: 1080px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 20px 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-        }
-
-        header {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-
-        h1 {
-            font-size: 1.35rem;
-            color: var(--primary);
-            margin: 0;
-        }
-
-        .actions-bar {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: opacity 0.2s;
-        }
-
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            color: #64748b;
-            border: 1px solid #cbd5e1;
-            font-size: 0.75rem;
-            padding: 6px 10px;
-        }
-
-        .btn-outline:hover {
-            background-color: #f8fafc;
-            color: var(--primary-dark);
-        }
-
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            background: #e2e8f0;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #475569;
-            font-size: 0.9rem;
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 0.88rem;
-        }
-
-        th, td {
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: var(--primary-dark);
-            font-weight: 600;
-        }
-
-        .workout-desc {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 6px;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 6px 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 0.85rem;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .tiros-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-
-        .tiros-grid input {
-            width: 48px;
-            text-align: center;
-            font-size: 0.75rem;
-            padding: 4px 2px;
-        }
-
-        /* Musculação Cards */
-        .muscle-group {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 16px;
-            background: #fafafa;
-        }
-
-        .muscle-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .muscle-header h3 {
-            margin: 0;
-            font-size: 1rem;
-            color: var(--primary);
-        }
-
-        .btn-add {
-            background-color: #10b981;
-            font-size: 0.75rem;
-            padding: 5px 10px;
-        }
-
-        .btn-remove {
-            background-color: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 4px 8px;
-            cursor: pointer;
-            font-size: 0.75rem;
-        }
-
-        .instructions {
-            background: #f8fafc;
-            border-left: 4px solid var(--primary);
-            padding: 15px;
-            border-radius: 4px;
-            margin-top: 25px;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-
-        .instructions h3 {
-            margin-top: 0;
-            color: var(--primary);
-        }
-
-        .instructions ul {
-            padding-left: 20px;
-            margin-bottom: 0;
-        }
-
-        .instructions li {
-            margin-bottom: 8px;
-        }
-
-        @media (max-width: 768px) {
-            table, thead, tbody, th, td, tr {
-                display: block;
-            }
-            thead tr {
-                display: none;
-            }
-            tr {
-                margin-bottom: 15px;
-                border: 1px solid var(--border-color);
-                border-radius: 6px;
-                overflow: hidden;
-            }
-            td {
-                border: none;
-                border-bottom: 1px solid #e2e8f0;
-            }
-        }
-
+        /* Estilos de impressão */
         @media print {
-            .actions-bar, .tabs, .btn-add, .btn-remove {
-                display: none !important;
+            body { background-color: white !important; color: black !important; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            #tab-corrida { display: block !important; }
+            #tab-musculacao { display: none !important; }
+            .shadow-lg, .shadow-md, .shadow-sm { box-shadow: none !important; }
+            .bg-slate-800 { background-color: #1e293b !important; color: white !important; -webkit-print-color-adjust: exact; }
+            input[type="text"] { 
+                border: 1px solid #e2e8f0 !important; 
+                background: white !important;
+                color: black !important;
             }
-            body {
-                background: white;
-                padding: 0;
-            }
-            .container {
-                box-shadow: none;
-                padding: 0;
-            }
+            input::placeholder { color: transparent; }
+            .grid { display: flex !important; flex-wrap: wrap !important; gap: 2px !important; }
+            .grid > input { width: 30px !important; height: 20px !important; padding: 0 !important; font-size: 8px !important;}
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
 
-<div class="container">
-    <header>
-        <h1>Projeto 5km Sub-20 & Musculação</h1>
-        <div class="actions-bar">
-            <button class="btn" onclick="exportarJSON()">💾 Salvar (Arquivo)</button>
-            <button class="btn" onclick="document.getElementById('fileInput').click()">📂 Carregar (Arquivo)</button>
-            <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="importarJSON(event)">
-            <button class="btn btn-outline" onclick="window.print()">🖨️ Imprimir</button>
-        </div>
-    </header>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="abrirAba(event, 'aba-corrida')">Corrida (12 Semanas)</button>
-        <button class="tab-btn" onclick="abrirAba(event, 'aba-musculacao')">Musculação (5 Treinos)</button>
+    <!-- Toast de Sucesso -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+        Salvo com sucesso!
     </div>
 
-    <!-- ABA 1: CORRIDA -->
-    <div id="aba-corrida" class="tab-content active">
-        <table id="tabela-corrida">
-            <thead>
-                <tr>
-                    <th style="width: 10%;">Semana</th>
-                    <th style="width: 34%;">Dia 1: Velocidade (Tiros)</th>
-                    <th style="width: 28%;">Dia 2: Tempo Run (Limiar)</th>
-                    <th style="width: 28%;">Dia 3: Longão</th>
-                </tr>
-            </thead>
-            <tbody id="corpo-corrida"></tbody>
-        </table>
+    <div class="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+        
+        <!-- Header -->
+        <header class="bg-slate-800 text-white p-5 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Atleta Híbrido</h1>
+                <p class="text-slate-300 mt-0.5 text-sm">5km Sub-20 & Musculação</p>
+            </div>
+            <div class="flex items-center gap-4 w-full md:w-auto justify-between no-print">
+                <!-- Botão Imprimir (Discreto) -->
+                <button onclick="window.print()" class="text-slate-400 hover:text-slate-200 text-xs flex items-center gap-1 transition" title="Imprimir / Gerar PDF">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Imprimir
+                </button>
 
-        <div class="instructions">
-            <h3>Como executar cada um dos 3 treinos:</h3>
-            <ul>
-                <li><strong>Treino 1 - Velocidade (Tiros / VO2 Max):</strong> Comece com 15 minutos de trote bem leve para aquecer e soltar a musculatura. Em seguida, faça o número de tiros indicado na semana no ritmo alvo (ex: 1:30 a 1:35 para cada 400m, ou ~3:50/km nos tiros longos). Entre cada tiro, faça de 60 a 90 segundos de recuperação caminhando ou parado. Ao terminar o último tiro, trote leve por 10 minutos para desaquecer. Anote o tempo de cada tiro nas caixinhas correspondentes.</li>
-                <li><strong>Treino 2 - Tempo Run (Limiar de Lactato):</strong> Faça 10 minutos de aquecimento leve. Depois, corra a distância principal de forma contínua (ou dividida nos blocos indicados) cravando o ritmo entre <strong>4:10/km e 4:20/km</strong>. É um ritmo "confortavelmente difícil", onde você consegue manter a passada constante, mas não consegue conversar. Finalize com 10 minutos de trote leve.</li>
-                <li><strong>Treino 3 - Longão (Resistência Aeróbica):</strong> Corrida contínua em ritmo confortável e conversacional (entre <strong>5:15/km e 5:30/km</strong>). O objetivo aqui é criar capilarização e resistência muscular/mental pelo tempo sob tensão, sem gerar desgaste excessivo nas pernas.</li>
-            </ul>
-        </div>
+                <!-- Botão Salvar (Destacado) -->
+                <button onclick="saveAll()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-xl shadow-md transition duration-200 flex items-center gap-2 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h-2v5.586l-1.293-1.293zM9 18a1 1 0 01-1-1v-2H5a2 2 0 01-2-2V5a2 2 0 012-2h4l2 2h4a2 2 0 012 2v8a2 2 0 01-2 2h-3v2a1 1 0 01-1 1H9z" />
+                    </svg>
+                    Salvar Progresso
+                </button>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <nav class="flex border-b border-slate-200 no-print" aria-label="Tabs">
+            <button onclick="switchTab('corrida')" id="btn-corrida" class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm md:text-base border-blue-600 text-blue-600 hover:text-blue-700 transition">
+                Corrida (Planilha)
+            </button>
+            <button onclick="switchTab('musculacao')" id="btn-musculacao" class="w-1/2 py-4 px-1 text-center border-b-2 border-transparent font-medium text-sm md:text-base text-slate-500 hover:text-slate-700 hover:border-slate-300 transition">
+                Musculação (Exercícios)
+            </button>
+        </nav>
+
+        <!-- ABA 1: CORRIDA -->
+        <main id="tab-corrida" class="tab-content active space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">Progressão de 12 Semanas</h2>
+                        <p class="text-xs text-slate-500 mt-1">Anota os tempos de cada tiro separadamente. Lembre-se de clicar em "Salvar Progresso".</p>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr class="bg-slate-800 text-slate-50 text-sm">
+                                <th class="p-4 font-semibold w-16 text-center">Sem.</th>
+                                <th class="p-4 font-semibold w-[40%]">Tiros (VO2 Max)</th>
+                                <th class="p-4 font-semibold w-[30%]">Tempo Run (Limiar)</th>
+                                <th class="p-4 font-semibold w-[30%]">Longão (Resistência)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corrida-tbody" class="text-sm divide-y divide-slate-200">
+                            <!-- Injetado via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Explicação dos Treinos -->
+            <div class="bg-slate-100 p-5 rounded-xl border border-slate-200 mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <span class="text-red-500 text-lg">⚡</span> Velocidade (Tiros)
+                    </h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">Foco em aumentar o <b>VO2 Máximo</b>. É um esforço bem alto e difícil de sustentar. Corra no pace alvo indicado e <b>descanse</b> (fique parado ou caminhe bem leve) pelo tempo determinado (geralmente 60 a 90s) entre cada tiro para que o corpo recupere a energia para o próximo.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <span class="text-orange-500 text-lg">🔥</span> Tempo Run (Limiar)
+                    </h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">É uma corrida firme e <b>desconfortável, mas sustentável</b>. O objetivo aqui não é dar um tiro até o limite, mas sim ensinar o seu corpo a correr rápido enquanto "limpa" o ácido lático. Se você não conseguir dizer mais do que 3 ou 4 palavras, o ritmo está certo.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                        <span class="text-blue-500 text-lg">🏃</span> Longão
+                    </h3>
+                    <p class="text-xs text-slate-600 leading-relaxed">A prioridade é o <b>tempo sob tensão</b> em ritmo confortável (pace de conversação). Você deve ser capaz de falar frases inteiras. Este treino constrói a base aeróbica (novos capilares sanguíneos) e a resistência mental para a segunda metade da prova.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- ABA 2: MUSCULAÇÃO -->
+        <main id="tab-musculacao" class="tab-content space-y-6 no-print">
+            
+            <!-- Formulário de Adição -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Adicionar Exercício
+                </h2>
+                
+                <form id="form-exercicio" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                    <div class="col-span-1 md:col-span-3">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Grupo Muscular</label>
+                        <select id="ex-categoria" class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                            <option value="Perna Anterior">Perna Anterior</option>
+                            <option value="Perna Posterior">Perna Posterior</option>
+                            <option value="Ombro">Ombro</option>
+                            <option value="Peito">Peito</option>
+                            <option value="Costas">Costas</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-span-1 md:col-span-4">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Nome do Exercício</label>
+                        <input type="text" id="ex-nome" placeholder="Ex: Agachamento Livre" required class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    </div>
+                    
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Peso (kg)</label>
+                        <input type="text" id="ex-peso" placeholder="Ex: 80" required class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    </div>
+
+                    <div class="col-span-1 md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Séries x Reps</label>
+                        <input type="text" id="ex-reps" placeholder="Ex: 4x10" required class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    </div>
+
+                    <div class="col-span-1 md:col-span-1">
+                        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-white rounded-lg p-2.5 font-medium transition shadow-sm flex justify-center items-center h-[42px]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+                <div id="form-error" class="hidden text-red-500 text-xs mt-2 font-medium">Preencha todos os campos.</div>
+                <div class="text-[10px] text-slate-400 mt-2 italic">* Os exercícios adicionados só serão salvos permanentemente após clicar no botão azul "Salvar Progresso" lá no topo.</div>
+            </div>
+
+            <!-- Listas Dinâmicas de Exercícios -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-800 text-white p-3 font-semibold text-sm">🦵 Perna Anterior (Quadríceps)</div>
+                    <ul id="lista-Perna Anterior" class="divide-y divide-slate-100 p-2 empty:p-4 empty:text-center empty:text-sm empty:text-slate-400 empty:after:content-['Vazio']"></ul>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-800 text-white p-3 font-semibold text-sm">🦵 Perna Posterior (Isquios/Glúteo)</div>
+                    <ul id="lista-Perna Posterior" class="divide-y divide-slate-100 p-2 empty:p-4 empty:text-center empty:text-sm empty:text-slate-400 empty:after:content-['Vazio']"></ul>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-800 text-white p-3 font-semibold text-sm">🛡️ Peito</div>
+                    <ul id="lista-Peito" class="divide-y divide-slate-100 p-2 empty:p-4 empty:text-center empty:text-sm empty:text-slate-400 empty:after:content-['Vazio']"></ul>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-800 text-white p-3 font-semibold text-sm">🦅 Costas</div>
+                    <ul id="lista-Costas" class="divide-y divide-slate-100 p-2 empty:p-4 empty:text-center empty:text-sm empty:text-slate-400 empty:after:content-['Vazio']"></ul>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden md:col-span-2">
+                    <div class="bg-slate-800 text-white p-3 font-semibold text-sm">🏋️ Ombro (Deltoides)</div>
+                    <ul id="lista-Ombro" class="divide-y divide-slate-100 p-2 empty:p-4 empty:text-center empty:text-sm empty:text-slate-400 empty:after:content-['Vazio']"></ul>
+                </div>
+            </div>
+            
+        </main>
     </div>
 
-    <!-- ABA 2: MUSCULAÇÃO -->
-    <div id="aba-musculacao" class="tab-content">
-        <div id="container-musculacao"></div>
-    </div>
-</div>
-
-<script>
-    // Estrutura periodizada das 12 semanas
-    const plano12Semanas = [
-        { sem: 1, tirosQtd: 8, tirosDesc: "8x 400m (Alvo: 1:34)", tempoDesc: "4 km contínuos (4:20/km)", longaoDesc: "10 km leves (5:20/km)" },
-        { sem: 2, tirosQtd: 9, tirosDesc: "9x 400m (Alvo: 1:33)", tempoDesc: "4 km contínuos (4:18/km)", longaoDesc: "10 km leves (5:20/km)" },
-        { sem: 3, tirosQtd: 10, tirosDesc: "10x 400m (Alvo: 1:32)", tempoDesc: "4.5 km contínuos (4:15/km)", longaoDesc: "11 km leves (5:20/km)" },
-        { sem: 4, tirosQtd: 6, tirosDesc: "Deload: 6x 400m (1:32)", tempoDesc: "3 km firmes (4:15/km)", longaoDesc: "8 km leves (5:25/km)" },
-        { sem: 5, tirosQtd: 6, tirosDesc: "6x 800m (Alvo: 3:08)", tempoDesc: "5 km contínuos (4:15/km)", longaoDesc: "12 km leves (5:15/km)" },
-        { sem: 6, tirosQtd: 10, tirosDesc: "10x 400m (Alvo: 1:30)", tempoDesc: "5 km contínuos (4:12/km)", longaoDesc: "12 km leves (5:15/km)" },
-        { sem: 7, tirosQtd: 5, tirosDesc: "5x 1000m (Alvo: 3:55)", tempoDesc: "2x 3 km (4:10/km | rec 90s)", longaoDesc: "13 km leves (5:15/km)" },
-        { sem: 8, tirosQtd: 6, tirosDesc: "Deload: 6x 400m (1:30)", tempoDesc: "4 km firmes (4:12/km)", longaoDesc: "9 km leves (5:20/km)" },
-        { sem: 9, tirosQtd: 6, tirosDesc: "6x 800m (Alvo: 3:05)", tempoDesc: "2x 3 km (4:08/km | rec 90s)", longaoDesc: "14 km leves (5:15/km)" },
-        { sem: 10, tirosQtd: 5, tirosDesc: "5x 1000m (Alvo: 3:52)", tempoDesc: "5 km contínuos (4:08/km)", longaoDesc: "12 km leves (5:15/km)" },
-        { sem: 11, tirosQtd: 8, tirosDesc: "8x 400m (Alvo: 1:28)", tempoDesc: "4 km ritmo forte (4:05/km)", longaoDesc: "10 km leves (5:20/km)" },
-        { sem: 12, tirosQtd: 4, tirosDesc: "Polimento: 4x 400m (1:30)", tempoDesc: "2 km soltos no RP (3:55/km)", longaoDesc: "PROVA: 5 KM SUB-20!" }
-    ];
-
-    const gruposMusculares = [
-        { id: "perna_ant", nome: "1. Perna Anterior (Quadríceps)" },
-        { id: "perna_post", nome: "2. Perna Posterior (Isquiotibiais e Glúteo)" },
-        { id: "ombro", nome: "3. Ombro" },
-        { id: "peito", nome: "4. Peito" },
-        { id: "costas", nome: "5. Costas" }
-    ];
-
-    // Estado da aplicação
-    let estadoApp = {
-        corrida: {},
-        musculacao: {
-            perna_ant: [{ ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }],
-            perna_post: [{ ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }],
-            ombro: [{ ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }],
-            peito: [{ ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }],
-            costas: [{ ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }, { ex: "", peso: "", rep: "" }]
+    <script>
+        // --- NAVEGAÇÃO DE ABAS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById('btn-corrida').className = "w-1/2 py-4 px-1 text-center border-b-2 border-transparent font-medium text-sm md:text-base text-slate-500 hover:text-slate-700 hover:border-slate-300 transition";
+            document.getElementById('btn-musculacao').className = "w-1/2 py-4 px-1 text-center border-b-2 border-transparent font-medium text-sm md:text-base text-slate-500 hover:text-slate-700 hover:border-slate-300 transition";
+            
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.getElementById(`btn-${tabId}`).className = "w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm md:text-base border-blue-600 text-blue-600 hover:text-blue-700 transition";
         }
-    };
 
-    function renderizarCorrida() {
-        const tbody = document.getElementById('corpo-corrida');
-        tbody.innerHTML = '';
+        // --- SISTEMA DE SALVAMENTO ---
+        function saveAll() {
+            // Salvar valores dos inputs de corrida
+            const inputs = document.querySelectorAll('.run-input');
+            inputs.forEach(input => {
+                const id = input.getAttribute('data-run-id');
+                if(input.value.trim() !== '') {
+                    localStorage.setItem(`run-${id}`, input.value);
+                } else {
+                    localStorage.removeItem(`run-${id}`);
+                }
+            });
 
-        plano12Semanas.forEach(item => {
-            const tr = document.createElement('tr');
-            let inputsTirosHTML = '';
-            for (let t = 1; t <= item.tirosQtd; t++) {
-                const chave = `s${item.sem}_t${t}`;
-                const valor = estadoApp.corrida[chave] || '';
-                inputsTirosHTML += `<input type="text" placeholder="${t}º" value="${valor}" oninput="atualizarCorrida('${chave}', this.value)">`;
+            // Salvar array de musculação atual (mantido na variável)
+            localStorage.setItem('exerciciosMusculacao', JSON.stringify(exercisesMemoria));
+
+            // Exibir Toast
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- LÓGICA DA ABA DE CORRIDA ---
+        const treinosCorrida = [
+            { w: 1, type: "normal", t1: "6x 400m @ 1:35", t2: "3 km @ 4:15/km", t3: "8 km @ 5:20/km" },
+            { w: 2, type: "normal", t1: "8x 400m @ 1:35", t2: "4 km @ 4:15/km", t3: "10 km @ 5:20/km" },
+            { w: 3, type: "normal", t1: "10x 400m @ 1:35", t2: "4 km @ 4:15/km", t3: "10 km @ 5:20/km" },
+            { w: 4, type: "recup", t1: "6x 400m @ 1:35", t2: "3 km @ 4:15/km", t3: "8 km @ 5:20/km" },
+            { w: 5, type: "normal", t1: "5x 800m @ 3:15", t2: "5 km @ 4:15/km", t3: "11 km @ 5:20/km" },
+            { w: 6, type: "normal", t1: "6x 800m @ 3:15", t2: "5 km @ 4:15/km", t3: "12 km @ 5:20/km" },
+            { w: 7, type: "normal", t1: "4x 1000m @ 3:55", t2: "6 km @ 4:15/km", t3: "12 km @ 5:20/km" },
+            { w: 8, type: "recup", t1: "4x 800m @ 3:15", t2: "4 km @ 4:15/km", t3: "10 km @ 5:20/km" },
+            { w: 9, type: "normal", t1: "5x 1000m @ 3:55", t2: "2x 3km @ 4:10/km", t3: "12 km @ 5:20/km" },
+            { w: 10, type: "normal", t1: "6x 1000m @ 3:55", t2: "6 km @ 4:10/km", t3: "14 km @ 5:20/km" },
+            { w: 11, type: "pico", t1: "3x 1600m @ 6:20", t2: "4 km @ 4:05/km", t3: "10 km @ 5:20/km" },
+            { w: 12, type: "prova", t1: "4x 400m @ 1:30 (Ativ.)", t2: "3 km Leve @ 4:10/km", t3: "🏆 PROVA 5km Sub-20" }
+        ];
+
+        function generateInputs(textoTreino, basId) {
+            // Regex para capturar padrões como "6x 400m" ou "2x 3km"
+            const match = textoTreino.match(/^(\d+)x/);
+            
+            if (match) {
+                // É um treino de repetições. Gerar 'count' campos de input.
+                const count = parseInt(match[1], 10);
+                let inputsHtml = '<div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1 mt-1.5">';
+                for(let i=1; i<=count; i++) {
+                    inputsHtml += `<input type="text" data-run-id="${basId}-${i}" placeholder="${i}º tiro" class="run-input w-full bg-white border border-slate-300 rounded p-1 text-center text-[11px] focus:ring-1 focus:ring-blue-500 outline-none">`;
+                }
+                inputsHtml += '</div>';
+                return inputsHtml;
+            } else {
+                // Treino contínuo (apenas 1 campo)
+                return `<input type="text" data-run-id="${basId}" placeholder="Anotar tempo final..." class="run-input w-full bg-white border border-slate-300 rounded p-2 text-xs md:text-sm focus:ring-1 focus:ring-blue-500 outline-none mt-1.5">`;
+            }
+        }
+
+        const tbody = document.getElementById('corrida-tbody');
+        
+        treinosCorrida.forEach(sem => {
+            let rowClass = "hover:bg-slate-100 transition";
+            let tag = "";
+            let colorText = "text-slate-600";
+            
+            if (sem.type === "recup") {
+                rowClass = "bg-blue-50/40 hover:bg-blue-100 transition";
+                tag = '<br><span class="text-[10px] font-normal text-blue-600 uppercase">Recup</span>';
+                colorText = "text-blue-700 font-medium";
+            } else if (sem.type === "pico") {
+                rowClass = "bg-yellow-50/40 hover:bg-yellow-100 transition";
+                tag = '<br><span class="text-[10px] font-normal text-yellow-700 uppercase">Pico</span>';
+                colorText = "text-yellow-700 font-medium";
+            } else if (sem.type === "prova") {
+                rowClass = "bg-green-50/40 hover:bg-green-100 transition";
+                tag = '<br><span class="text-[10px] font-normal text-green-700 uppercase">Prova</span>';
+                colorText = "text-green-700 font-medium";
             }
 
-            const chaveTempo = `s${item.sem}_tempo`;
-            const chaveLongao = `s${item.sem}_longao`;
-
+            const tr = document.createElement('tr');
+            tr.className = rowClass;
             tr.innerHTML = `
-                <td style="font-weight:bold; color:var(--primary);">Semana ${item.sem}</td>
-                <td>
-                    <div class="workout-desc">${item.tirosDesc}</div>
-                    <div class="tiros-grid">${inputsTirosHTML}</div>
+                <td class="p-4 font-bold text-center border-r border-slate-100 align-top">${sem.w} ${tag}</td>
+                <td class="p-4 border-r border-slate-100 align-top">
+                    <div class="text-xs md:text-sm ${colorText}">Alvo: <b>${sem.t1}</b></div>
+                    ${generateInputs(sem.t1, `sem${sem.w}-t1`)}
                 </td>
-                <td>
-                    <div class="workout-desc">${item.tempoDesc}</div>
-                    <input type="text" placeholder="Anote o Tempo / Pace" value="${estadoApp.corrida[chaveTempo] || ''}" oninput="atualizarCorrida('${chaveTempo}', this.value)">
+                <td class="p-4 border-r border-slate-100 align-top">
+                    <div class="text-xs md:text-sm ${colorText}">Alvo: <b>${sem.t2}</b></div>
+                    ${generateInputs(sem.t2, `sem${sem.w}-t2`)}
                 </td>
-                <td>
-                    <div class="workout-desc">${item.longaoDesc}</div>
-                    <input type="text" placeholder="Anote Distância / Tempo" value="${estadoApp.corrida[chaveLongao] || ''}" oninput="atualizarCorrida('${chaveLongao}', this.value)">
+                <td class="p-4 align-top">
+                    <div class="text-xs md:text-sm ${colorText}">Alvo: <b>${sem.t3}</b></div>
+                    <input type="text" data-run-id="sem${sem.w}-t3" placeholder="${sem.w === 12 ? 'TEMPO FINAL DA PROVA!' : 'Anotar tempo...'}" class="run-input w-full bg-white border ${sem.w === 12 ? 'border-green-500 border-2 font-bold text-green-700' : 'border-slate-300'} rounded p-2 text-xs md:text-sm focus:ring-1 focus:ring-blue-500 outline-none mt-1.5">
                 </td>
             `;
             tbody.appendChild(tr);
         });
-    }
 
-    function renderizarMusculacao() {
-        const container = document.getElementById('container-musculacao');
-        container.innerHTML = '';
+        // Carregar valores iniciais do LocalStorage para Corrida
+        document.querySelectorAll('.run-input').forEach(input => {
+            const id = input.getAttribute('data-run-id');
+            const savedValue = localStorage.getItem(`run-${id}`);
+            if (savedValue) input.value = savedValue;
+        });
 
-        gruposMusculares.forEach(grupo => {
-            const listaExercicios = estadoApp.musculacao[grupo.id] || [];
-            let linhasHTML = '';
 
-            listaExercicios.forEach((item, index) => {
-                linhasHTML += `
-                    <tr>
-                        <td style="width: 50%;"><input type="text" placeholder="Nome do exercício" value="${item.ex}" oninput="atualizarMusculacao('${grupo.id}', ${index}, 'ex', this.value)"></td>
-                        <td style="width: 20%;"><input type="text" placeholder="Ex: 30kg" value="${item.peso}" oninput="atualizarMusculacao('${grupo.id}', ${index}, 'peso', this.value)"></td>
-                        <td style="width: 20%;"><input type="text" placeholder="Ex: 4x10" value="${item.rep}" oninput="atualizarMusculacao('${grupo.id}', ${index}, 'rep', this.value)"></td>
-                        <td style="width: 10%; text-align:center;"><button class="btn-remove" onclick="removerExercicio('${grupo.id}', ${index})">✕</button></td>
-                    </tr>
-                `;
+        // --- LÓGICA DA ABA DE MUSCULAÇÃO ---
+        let exercisesMemoria = JSON.parse(localStorage.getItem('exerciciosMusculacao')) || [];
+        const categories = ["Perna Anterior", "Perna Posterior", "Ombro", "Peito", "Costas"];
+
+        function renderExercises() {
+            categories.forEach(cat => {
+                document.getElementById(`lista-${cat}`).innerHTML = '';
             });
 
-            const div = document.createElement('div');
-            div.className = 'muscle-group';
-            div.innerHTML = `
-                <div class="muscle-header">
-                    <h3>${grupo.nome}</h3>
-                    <button class="btn btn-add" onclick="adicionarExercicio('${grupo.id}')">+ Adicionar Exercício</button>
-                </div>
-                <table style="margin-bottom:0;">
-                    <thead>
-                        <tr>
-                            <th>Exercício</th>
-                            <th>Peso (Carga)</th>
-                            <th>Séries / Reps</th>
-                            <th style="text-align:center;">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>${linhasHTML}</tbody>
-                </table>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    function atualizarCorrida(chave, valor) {
-        estadoApp.corrida[chave] = valor;
-        salvarCacheNavegador();
-    }
-
-    function atualizarMusculacao(grupoId, index, campo, valor) {
-        estadoApp.musculacao[grupoId][index][campo] = valor;
-        salvarCacheNavegador();
-    }
-
-    function adicionarExercicio(grupoId) {
-        estadoApp.musculacao[grupoId].push({ ex: "", peso: "", rep: "" });
-        salvarCacheNavegador();
-        renderizarMusculacao();
-    }
-
-    function removerExercicio(grupoId, index) {
-        estadoApp.musculacao[grupoId].splice(index, 1);
-        salvarCacheNavegador();
-        renderizarMusculacao();
-    }
-
-    function abrirAba(evt, idAba) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(idAba).classList.add('active');
-        evt.currentTarget.classList.add('active');
-    }
-
-    function salvarCacheNavegador() {
-        localStorage.setItem('treino_sub20_v2', JSON.stringify(estadoApp));
-    }
-
-    // Exportar para arquivo local (.json)
-    function exportarJSON() {
-        salvarCacheNavegador();
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(estadoApp, null, 2));
-        const link = document.createElement('a');
-        link.setAttribute("href", dataStr);
-        link.setAttribute("download", "backup-treinos-sub20.json");
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    }
-
-    // Importar de arquivo local (.json)
-    function importarJSON(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const importado = JSON.parse(e.target.result);
-                if (importado.corrida && importado.musculacao) {
-                    estadoApp = importado;
-                    salvarCacheNavegador();
-                    renderizarCorrida();
-                    renderizarMusculacao();
-                } else {
-                    alert("Formato de arquivo inválido.");
-                }
-            } catch (err) {
-                alert("Erro ao ler o arquivo JSON.");
-            }
-        };
-        reader.readAsText(file);
-        event.target.value = '';
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        const salvo = localStorage.getItem('treino_sub20_v2');
-        if (salvo) {
-            try {
-                estadoApp = JSON.parse(salvo);
-            } catch (e) { console.error(e); }
+            exercisesMemoria.forEach(ex => {
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center p-3 hover:bg-slate-50 transition group";
+                li.innerHTML = `
+                    <div class="flex-1">
+                        <p class="font-semibold text-slate-800 text-sm">${ex.nome}</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Peso: <span class="font-medium text-slate-700">${ex.peso}kg</span> &nbsp;|&nbsp; <span class="font-medium text-slate-700">${ex.reps}</span></p>
+                    </div>
+                    <button type="button" onclick="removeExercise('${ex.id}')" class="text-slate-300 hover:text-red-500 p-2 transition" title="Remover da lista">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                `;
+                document.getElementById(`lista-${ex.categoria}`).appendChild(li);
+            });
         }
-        renderizarCorrida();
-        renderizarMusculacao();
-    });
-</script>
 
+        function removeExercise(id) {
+            exercisesMemoria = exercisesMemoria.filter(ex => ex.id !== id);
+            renderExercises();
+            // Obs: A remoção definitiva do localStorage ocorrerá ao clicar no botão "Salvar Progresso"
+        }
+
+        document.getElementById('form-exercicio').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            const categoria = document.getElementById('ex-categoria').value;
+            const nome = document.getElementById('ex-nome').value.trim();
+            const peso = document.getElementById('ex-peso').value.trim();
+            const reps = document.getElementById('ex-reps').value.trim();
+            const errorDiv = document.getElementById('form-error');
+
+            if (!nome || !peso || !reps) {
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            errorDiv.classList.add('hidden');
+
+            const novoExercicio = {
+                id: Date.now().toString(),
+                categoria,
+                nome,
+                peso,
+                reps
+            };
+
+            exercisesMemoria.push(novoExercicio);
+            renderExercises();
+
+            document.getElementById('ex-nome').value = '';
+            document.getElementById('ex-peso').value = '';
+            document.getElementById('ex-reps').value = '';
+            document.getElementById('ex-nome').focus();
+        });
+
+        // Init Musculação
+        renderExercises();
+
+    </script>
 </body>
 </html>
